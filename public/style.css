@@ -43,8 +43,5 @@ li {
 
 #displaylink {
   position: fixed;
+  cursor: pointer;
 }
-
-/* could you make it so that the message list isnt shifted to the right*/
-
-/*make a function to add a/remove a display:none then have a link somewhere that triggers that ??*/
