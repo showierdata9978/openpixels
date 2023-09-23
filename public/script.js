@@ -1,3 +1,12 @@
+const canvasElm = document.getElementById("canvas");
+const displayLink = document.getElementById("displaylink");
+const topElement = document.getElementById("top");
+const nameElement = document.getElementById("name");
+const messageList = document.getElementById("messagelist");
+const messageInput = document.getElementById("messageinput");
+const ulist = document.getElementById("ulist");
+const serror = document.getElementById("serror");
+const changeName = document.getElementById("changename");
 const socket = io();
 
 socket.on("connect", () => {
@@ -5,7 +14,7 @@ socket.on("connect", () => {
   socket.emit("getusers");
 });
 
-const ctx = document.getElementById("canvas").getContext("2d");
+const ctx = canvasElm.getContext("2d");
 const colors = [
   "red",
   "green",
@@ -43,19 +52,19 @@ socket.on("anonname", (data) => {
 });
 
 function navdisplay() {
-  if (document.getElementById("displaylink").innerText == "Hide") {
-    document.getElementById("top").setAttribute("style", "display: none;");
-    document.getElementById("displaylink").innerText = "Show";
+  if (displayLink.innerText == "Hide") {
+    topElement.setAttribute("style", "display: none;");
+    displayLink.innerText = "Show";
   } else {
-    document.getElementById("top").setAttribute("style", "display: initial;");
-    document.getElementById("displaylink").innerText = "Hide";
+    topElement.setAttribute("style", "display: initial;");
+    displayLink.innerText = "Hide";
   }
 }
 
-document.getElementById("changename").onclick = () => {
-  let username = document.getElementById("name").value;
+changeName.onclick = () => {
+  let username = nameElement.value;
 
-  document.getElementById("name").value = "";
+  nameElement.value = "";
 
   localStorage.setItem("Username", username);
 
@@ -66,23 +75,23 @@ document.getElementById("sendform").addEventListener("submit", (e) => {
   e.preventDefault();
   socket.emit("chat-message", {
     username: username,
-    message: document.getElementById("messageinput").value,
+    message: messageInput.value,
   });
 
-  document.getElementById("messageinput").value = "";
+  messageInput.value = "";
 });
 
 socket.on("chat-message", (data) => {
   let newmessage = document.createElement("li");
   newmessage.textContent = `${data.username}: ${data.message}`;
-  document.getElementById("messagelist").prepend(newmessage);
+  messageList.prepend(newmessage);
 });
 
 socket.on("get-chat", (data) => {
   data.forEach((msg) => {
     let newmessage = document.createElement("li");
     newmessage.textContent = `${msg.username}: ${msg.message}`;
-    document.getElementById("messagelist").prepend(newmessage);
+    messageList.prepend(newmessage);
   });
 });
 
@@ -106,9 +115,7 @@ socket.on("fill", (data) => {
 socket.on("usernames", (data) => {
   usernames = data;
 
-  document.getElementById(
-    "ulist"
-  ).textContent = `Users online: ${usernames.join(", ")}`;
+  ulist.textContent = `Users online: ${usernames.join(", ")}`;
 });
 
 socket.on("username-replace", (data) => {
@@ -116,26 +123,20 @@ socket.on("username-replace", (data) => {
 
   usernames[usernames.indexOf(data.before)] = data.after;
 
-  document.getElementById(
-    "ulist"
-  ).textContent = `Users online: ${usernames.join(", ")}`;
+  ulist.textContent = `Users online: ${usernames.join(", ")}`;
 });
 
 socket.on("username-remove", (data) => {
   try {
     usernames.splice(usernames.indexOf(data), 1);
-    document.getElementById(
-      "ulist"
-    ).textContent = `Users online: ${usernames.join(", ")}`;
+    ulist.textContent = `Users online: ${usernames.join(", ")}`;
   } catch (error) {}
 });
 
 socket.on("username-add", (data) => {
   try {
     usernames.push(data);
-    document.getElementById(
-      "ulist"
-    ).textContent = `Users online: ${usernames.join(", ")}`;
+    ulist.textContent = `Users online: ${usernames.join(", ")}`;
   } catch (error) {}
 });
 
@@ -157,18 +158,18 @@ socket.on("disconnect", () => {
 socket.on("serror", (data) => {
   console.log("server error:" + data);
 
-  document.getElementById("serror").innerText = "Server Error(s): " + data;
+  serror.innerText = "Server Error(s): " + data;
   setTimeout(() => {
-    document.getElementById("serror").innerText = " ";
+    serror.innerText = " ";
   }, 8 * 1000);
 });
 
-document.getElementById("canvas").addEventListener("mousedown", (e) => {
+canvasElm.addEventListener("mousedown", (e) => {
   if (e.button != 0 || cooldown >= Date.now() - 400) {
     return;
   }
   cooldown = Date.now();
-  let boundingrect = document.getElementById("canvas").getBoundingClientRect();
+  let boundingrect = canvasElm.getBoundingClientRect();
   console.log(boundingrect);
   let x = Math.floor(e.clientX - boundingrect.left);
   let y = Math.floor(e.clientY - boundingrect.top);
@@ -188,23 +189,48 @@ document.getElementById("canvas").addEventListener("mousedown", (e) => {
 
   socket.emit("fill", senddata);
 });
-
-document.getElementById("canvas").addEventListener("contextmenu", (e) => {
+canvasElm.addEventListener("contextmenu", (e) => {
   e.preventDefault();
   //showing usernames
 
-  if (e.button != 0 || cooldown >= Date.now() - 400) {
-    return;
-  }
-  cooldown = Date.now();
-  let boundingrect = document.getElementById("canvas").getBoundingClientRect();
+  let boundingrect = canvasElm.getBoundingClientRect();
   console.log(boundingrect);
   let x = Math.floor(e.clientX - boundingrect.left);
   let y = Math.floor(e.clientY - boundingrect.top);
 
-  Math.floor(x / 20), Math.floor(y / 20);
+  try {
+    console.log(canvas[Math.floor(x / 20)][Math.floor(y / 20)].author);
+    document.getElementById("selectedauthor").textContent = `Filled by ${
+      canvas[Math.floor(x / 20)][Math.floor(y / 20)].author
+    }`;
+  } catch (_) {
+    document.getElementById("selectedauthor").textContent = `Filled by nobody`;
+    let authorstyle = document.getElementById("authordiv").style;
+    authorstyle.position = "absolute";
+    authorstyle.left = x + 20 + "px";
+    authorstyle.top = y + 20 + "px";
+  }
 
-  alert();
+  // let color = canvas[Math.floor(x / 20)][Math.floor(y / 20)].color;
+  ctx.strokeStyle = "#000000";
+  ctx.strokeRect(Math.floor(x / 20) * 20, Math.floor(y / 20) * 20, 20, 20);
+
+  let authorstyle = document.getElementById("authordiv").style;
+  authorstyle.position = "absolute";
+  authorstyle.left = x + 20 + "px";
+  authorstyle.top = y + 20 + "px";
+
+  setTimeout(() => {
+    document.getElementById("selectedauthor").textContent = ``;
+    authorstyle.left = 0;
+    authorstyle.top = 0;
+    ctx.clearRect(0, 0, canvasElm.width, canvasElm.height);
+    Object.keys(canvas).forEach((x) => {
+      Object.keys(canvas[x]).forEach((y) => {
+        singleCell(x, y, canvas[x][y].color);
+      });
+    });
+  }, 2000);
 });
 
 setInterval(() => {
