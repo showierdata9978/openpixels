@@ -1,0 +1,50 @@
+body {
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+    Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
+}
+
+input {
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+    Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
+}
+
+button {
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+    Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
+}
+
+ul {
+  overflow: hidden;
+  overflow-y: scroll;
+  height: 75px;
+}
+
+#messagelist {
+  height: 100px;
+  list-style-type: none;
+}
+
+li {
+  border-top: 1px solid #404040;
+}
+
+#top {
+  position: fixed;
+  top: 0px;
+  left: 0px;
+  background: #ffffff8a;
+  width: 300px;
+  height: fit-content;
+  padding: 20px;
+  color: #404040;
+  backdrop-filter: saturate(2) blur(20px);
+  border-bottom-right-radius: 15px;
+}
+
+#displaylink {
+  position: fixed;
+}
+
+/* could you make it so that the message list isnt shifted to the right*/
+
+/*make a function to add a/remove a display:none then have a link somewhere that triggers that ??*/
