@@ -22,6 +22,7 @@ ul {
 #messagelist {
   height: 100px;
   list-style-type: none;
+  padding: 0;
 }
 
 li {
@@ -44,4 +45,17 @@ li {
 #displaylink {
   position: fixed;
   cursor: pointer;
+}
+
+#authordiv {
+  position: absolute;
+  backdrop-filter: saturate(2) blur(20px);
+  border-radius: 10px;
+  background: #ffffff8a;
+  width: fit-content;
+  height: fit-content;
+}
+
+#selectedauthor {
+  color: #404040;
 }
