@@ -15,7 +15,6 @@ let currentid = 0;
 
 /*
   TODO list:
-    - Who placed what cell
     - Mod panel with passkey
     - Filter
     - No more then 2 clients per ip
@@ -123,7 +122,6 @@ function ratelimit(clientID, scope, callback) {
 
     if (sockdata[element.name] > Date.now() * 1000 - element.time) {
       callback();
-      sock.emit("alldata", alldata);
       sockdata.overruns++;
 
       // writelog("Rate limited!");
@@ -169,6 +167,10 @@ io.on("connection", (socket) => {
   socket.on("fill", (data) => {
     ratelimit(clientID, "fill", () => {
       Log("Filling too quickly!", cdata.id, cdata.username);
+      ret = {};
+      ret[data.x] = {};
+      ret[data.x][data.y] = alldata[data.x][data.y];
+      sock.emit("fill", ret);
     });
 
     try {
