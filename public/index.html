@@ -12,18 +12,23 @@
       <h1>openpixels</h1>
       <p>
         As of 2023-09-23 at 3:23 PM CST, the canvas was cleared. View the old
-        canvas <a href="/oldcanvas.html">here.</a>
+        canvas <a href="/oldcanvas">here.</a>
       </p>
       <p id="ulist">Users Online: Loading...</p>
-      <p id="cooldown"></p>
+      <!-- <p id="cooldown"></p> -->
       <p id="serror"></p>
-      <input id="name" type="text" placeholder="Nickname" />
+      <input id="name" autocomplete="off" type="text" placeholder="Nickname" />
       <button id="changename">Change Username</button>
+      <br />
       <label>Set color:</label>
       <input id="color" type="color" />
       <ul id="messagelist"></ul>
       <form id="sendform" action="">
-        <input id="messageinput" placeholder="Type a message..." />
+        <input
+          id="messageinput"
+          autocomplete="off"
+          placeholder="Type a message..."
+        />
         <button>Send</button>
       </form>
     </div>
@@ -31,9 +36,8 @@
     <div id="authordiv"><p id="selectedauthor"></p></div>
     <!-- <button onclick="generate()">Generate!</button> -->
     <br />
-    <canvas id="canvas" width="2000" height="2000"></canvas>
+    <canvas id="canvas" width="4000" height="4000"></canvas>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.7.2/socket.io.js"></script>
     <script src="script.js"></script>
   </body>
 </html>
-

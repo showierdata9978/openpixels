@@ -46,9 +46,15 @@ let canvas = {};
 let usernames = [];
 
 let username;
+let kickreason = "No Reason Given.";
+let hideMouse = true;
 
 socket.on("anonname", (data) => {
   username = data;
+});
+
+socket.on("predisconnect", (data) => {
+  kickreason = data;
 });
 
 function navdisplay() {
@@ -93,6 +99,15 @@ socket.on("get-chat", (data) => {
     newmessage.textContent = `${msg.username}: ${msg.message}`;
     messageList.prepend(newmessage);
   });
+});
+
+socket.on("serror", (data) => {
+  console.log("server error:" + data);
+
+  serror.innerText = "Server Error(s): " + data;
+  setTimeout(() => {
+    serror.innerText = " ";
+  }, 8 * 1000);
 });
 
 function singleCell(x, y, color) {
@@ -151,17 +166,61 @@ socket.on("alldata", (data) => {
 });
 
 socket.on("disconnect", () => {
-  document.body.innerHTML =
-    "<h1>openpixels</h1> <p>Sorry, You have been kicked. This could be either from spamming, or a server shutdown. Thank you!</p>";
+  document.body.innerHTML = `<h1>openpixels</h1> <p>Sorry, You have been kicked. This could be either from a moderator, or a server shutdown. Thank you!</p>`;
+  if (kickreason != "No Reason Given.") {
+    let kickelement = document.createElement("p");
+    kickelement.innerHTML = `Kick reason: ${kickreason}`;
+    document.body.appendChild(kickelement);
+  }
 });
 
-socket.on("serror", (data) => {
-  console.log("server error:" + data);
+let StartPanning = false;
+let Startingx;
+let Startingy;
 
-  serror.innerText = "Server Error(s): " + data;
-  setTimeout(() => {
-    serror.innerText = " ";
-  }, 8 * 1000);
+canvasElm.addEventListener("wheel", (e) => {
+  e.preventDefault(); // Prevent scrolling
+
+  // ADD ZOOM here
+});
+
+canvasElm.addEventListener("mousedown", (e) => {
+  if (e.button == 2) {
+    e.preventDefault();
+    e.stopPropagation();
+    StartPanning = true;
+    let boundingrect = canvasElm.getBoundingClientRect();
+    Startingx = e.clientX - boundingrect.left;
+    Startingy = e.clientY - boundingrect.top;
+    document.body.style.cursor = "none";
+  }
+});
+
+const customMouse = document.getElementById("customMouse");
+
+canvasElm.addEventListener("mousemove", (e) => {
+  if (e.button == 2) {
+    if (StartPanning) {
+      e.preventDefault();
+      e.stopPropagation();
+      let boundingrect = canvasElm.getBoundingClientRect();
+      let x = e.clientX - boundingrect.left;
+      let y = e.clientY - boundingrect.top;
+
+      const dx = Startingx - x;
+      const dy = Startingy - y;
+      window.scrollBy(dx, dy);
+    }
+  }
+});
+
+canvasElm.addEventListener("mouseup", (e) => {
+  if (e.button == 2) {
+    e.preventDefault();
+    e.stopPropagation();
+    StartPanning = false;
+    document.body.style.cursor = "default";
+  }
 });
 
 canvasElm.addEventListener("mousedown", (e) => {
@@ -170,7 +229,6 @@ canvasElm.addEventListener("mousedown", (e) => {
   }
   cooldown = Date.now();
   let boundingrect = canvasElm.getBoundingClientRect();
-  console.log(boundingrect);
   let x = Math.floor(e.clientX - boundingrect.left);
   let y = Math.floor(e.clientY - boundingrect.top);
 
@@ -189,17 +247,16 @@ canvasElm.addEventListener("mousedown", (e) => {
 
   socket.emit("fill", senddata);
 });
+
 canvasElm.addEventListener("contextmenu", (e) => {
   e.preventDefault();
   //showing usernames
 
   let boundingrect = canvasElm.getBoundingClientRect();
-  console.log(boundingrect);
   let x = Math.floor(e.clientX - boundingrect.left);
   let y = Math.floor(e.clientY - boundingrect.top);
 
   try {
-    console.log(canvas[Math.floor(x / 20)][Math.floor(y / 20)].author);
     document.getElementById("selectedauthor").textContent = `Filled by ${
       canvas[Math.floor(x / 20)][Math.floor(y / 20)].author
     }`;
@@ -233,19 +290,18 @@ canvasElm.addEventListener("contextmenu", (e) => {
   }, 2000);
 });
 
-setInterval(() => {
-  if (cooldown >= Date.now() - 500) {
-    document.getElementById("cooldown").innerText =
-      "Wait 0.4 second(s) before painting!";
-  } else {
-    document.getElementById("cooldown").innerText = "";
-  }
-}, 250);
+// setInterval(() => {
+//   if (cooldown >= Date.now() - 500) {
+//     document.getElementById("cooldown").innerText =
+//       "Wait 0.4 second(s) before painting!";
+//   } else {
+//     document.getElementById("cooldown").innerText = "";
+//   }
+// }, 250);
 
 setTimeout(() => {
   const SavedUsername = localStorage.getItem("Username");
   if (SavedUsername) {
-    console.log(SavedUsername);
     socket.emit("username", { name: SavedUsername });
   }
-}, 300); // Because idk might help
+}, 300);

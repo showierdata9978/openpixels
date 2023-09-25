@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>openpixels mod panel</title>
+    <link rel="stylesheet" type="text/css" href="/style.css" />
+  </head>
+  <body>
+    <noscript>Please enable JS.</noscript>
+    <a href="/">Go back</a>
+    <br />
+    <br />
+    <form id="password" action="">
+      <label>Password</label>
+      <input
+        id="password2"
+        placeholder="Please enter this before anything else"
+      />
+      <button>Enter</button>
+    </form>
+    <p id="pairs">Client IDs TO Usernames: Enter Password</p>
+    <p id="serror"></p>
+    <label>Client ID</label>
+    <input id="cid" placeholder="ID" type="number" />
+    <br />
+    <p><b>Moderation Functions</b></p>
+    <form id="ChangeUName" action="">
+      <label>Change Username</label>
+      <input id="newusername" placeholder="Username" />
+      <button>Change Username</button>
+    </form>
+    <button id="resetname">Reset Username</button>
+    <br />
+    <br />
+    <form id="kick" action="">
+      <label>Kick</label>
+      <textarea id="kickreason" placeholder="Kick Reason"></textarea>
+      <button>Kick ID</button>
+    </form>
+    <form id="error" action="">
+      <label>Error</label>
+      <input id="errorinput" placeholder="Funny Error" />
+      <button>Send Error</button>
+    </form>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.7.2/socket.io.js"></script>
+    <script src="./script.js"></script>
+  </body>
+</html>
