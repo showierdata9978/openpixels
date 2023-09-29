@@ -1,17 +1,12 @@
 const socket = io(document.location.origin);
+const messageList = document.getElementById("messagelist");
+const messageInput = document.getElementById("messageinput");
 
 let cid = document.getElementById("cid");
 
 /*
-  Done:
-    - Change/reset usernames
-
   Mod Panel TODO:
-    - Unhardcode passwords
-    - Chat Moderation (Deletion)
-    - Canvas Moderation (Fast Placing)
-    - IP ban?
-    - No more looking at client pairs (After mod panel fully done)
+    - Fast Placing
 */
 
 socket.on("connect", () => {
@@ -42,6 +37,50 @@ document.getElementById("resetname").addEventListener("click", (e) => {
     passkey: password,
     client_id: parseInt(cid.value),
   });
+});
+
+socket.on("chat-message", (data) => {
+  let newmessage = document.createElement("li");
+  newmessage.id = "msg-" + data.id;
+  newmessage.textContent = `${data.username}: ${data.message} (ID: ${data.id})`;
+  messageList.prepend(newmessage);
+});
+
+document.getElementById("delchat").addEventListener("submit", (e) => {
+  e.preventDefault();
+  socket.emit("mod-del-chat-message", {
+    id: parseInt(document.getElementById("chatid").value),
+    passkey: password,
+  });
+});
+
+// socket.on("remove-chat-msg", (data) => {
+//   try {
+//     document.getElementById("msg-" + data.id).remove();
+//   } catch (error) {
+//     console.log("Error removing ID " + data.id);
+//   }
+// });
+
+socket.on("get-chat", (data) => {
+  data.forEach((msg) => {
+    if (msg.username != "") {
+      let newmessage = document.createElement("li");
+      newmessage.id = "msg-" + msg.id;
+      newmessage.textContent = `${msg.username}: ${msg.message} (ID: ${msg.id})`;
+      messageList.prepend(newmessage);
+    }
+  });
+});
+
+document.getElementById("chatform").addEventListener("submit", (e) => {
+  e.preventDefault();
+  socket.emit("chat-message", {
+    username: "mod",
+    message: messageInput.value,
+  });
+
+  messageInput.value = "";
 });
 
 document.getElementById("ChangeUName").addEventListener("submit", (e) => {
@@ -115,6 +154,15 @@ document.getElementById("kick").addEventListener("submit", (e) => {
   socket.emit("kick", {
     client_id: parseInt(cid.value),
     reason: document.getElementById("kickreason").value,
+    passkey: password,
+  });
+});
+
+document.getElementById("ban").addEventListener("submit", (e) => {
+  e.preventDefault();
+  socket.emit("ban", {
+    client_id: parseInt(cid.value),
+    reason: document.getElementById("banreason").value,
     passkey: password,
   });
 });

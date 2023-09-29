@@ -1,4 +1,5 @@
 *bak*
 *.txt
 database.json
+banned.json
 .env

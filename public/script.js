@@ -46,6 +46,7 @@ let canvas = {};
 let usernames = [];
 
 let username;
+let pickingcolor;
 let kickreason = "No Reason Given.";
 let hideMouse = true;
 
@@ -65,6 +66,10 @@ function navdisplay() {
     topElement.setAttribute("style", "display: initial;");
     displayLink.innerText = "Hide";
   }
+}
+
+function pickcolor() {
+  pickingcolor = 1;
 }
 
 changeName.onclick = () => {
@@ -89,18 +94,30 @@ document.getElementById("sendform").addEventListener("submit", (e) => {
 
 socket.on("chat-message", (data) => {
   let newmessage = document.createElement("li");
+  newmessage.id = "msg-" + data.id;
   newmessage.textContent = `${data.username}: ${data.message}`;
   messageList.prepend(newmessage);
 });
 
-socket.on("get-chat", (data) => {
-  data.forEach((msg) => {
-    let newmessage = document.createElement("li");
-    newmessage.textContent = `${msg.username}: ${msg.message}`;
-    messageList.prepend(newmessage);
-  });
+socket.on("remove-chat-msg", (data) => {
+  try {
+    document.getElementById("msg-" + data.id).remove();
+  } catch (error) {
+    console.log("Error removing ID " + data.id);
+    console.log(error);
+  }
 });
 
+socket.on("get-chat", (data) => {
+  data.forEach((msg) => {
+    if (msg.username != "") {
+      let newmessage = document.createElement("li");
+      newmessage.id = "msg-" + msg.id;
+      newmessage.textContent = `${msg.username}: ${msg.message}`;
+      messageList.prepend(newmessage);
+    }
+  });
+});
 socket.on("serror", (data) => {
   console.log("server error:" + data);
 
@@ -110,9 +127,11 @@ socket.on("serror", (data) => {
   }, 8 * 1000);
 });
 
+let PixelSize = 20;
+
 function singleCell(x, y, color) {
   ctx.fillStyle = color;
-  ctx.fillRect(x * 20, y * 20, 20, 20);
+  ctx.fillRect(x * PixelSize, y * PixelSize, PixelSize, PixelSize);
 }
 
 socket.on("fill", (data) => {
@@ -178,10 +197,61 @@ let StartPanning = false;
 let Startingx;
 let Startingy;
 
+let zoomLevel = 100;
+let Zoom = 1;
+
 canvasElm.addEventListener("wheel", (e) => {
   e.preventDefault(); // Prevent scrolling
+  e.stopPropagation();
 
-  // ADD ZOOM here
+  //canvasElm.style.zoom = Zoom;
+
+  var laterpixsize = PixelSize - e.deltaY / 50;
+
+  console.log(laterpixsize);
+
+  if (laterpixsize < 5.5) {
+    return;
+  }
+  if (laterpixsize * 500 > 15000) {
+    return;
+  }
+
+  PixelSize -= e.deltaY / 50;
+
+  // ctx.save();
+  // ctx.translate(canvasElm.width / 2, canvasElm.height / 2);
+  // // ctx.scale(PixelSize / 20, PixelSize / 20);
+
+  // ctx.clearRect(0, 0, canvasElm.width, canvasElm.height);
+
+  // console.log(canvas);
+  // Object.keys(canvas).forEach((x) => {
+  //   Object.keys(canvas[x]).forEach((y) => {
+  //     // singleCell(x, y, canvas[x][y].color);
+  //     ctx.fillStyle = canvas[x][y].color;
+  //     ctx.fillRect(x * PixelSize, y * PixelSize, PixelSize, PixelSize);
+  //   });
+  // });
+
+  // ctx.restore();
+
+  // let boundingrect = canvasElm.getBoundingClientRect();
+
+  // let x = e.screenX - boundingrect.left;
+  // let y = e.screenY - boundingrect.top;
+
+  canvasElm.height = PixelSize * 300;
+  canvasElm.width = PixelSize * 300;
+
+  ctx.clearRect(0, 0, canvasElm.width, canvasElm.height);
+  Object.keys(canvas).forEach((x) => {
+    Object.keys(canvas[x]).forEach((y) => {
+      singleCell(x, y, canvas[x][y].color);
+    });
+  });
+
+  // window.scrollBy(x, y);
 });
 
 canvasElm.addEventListener("mousedown", (e) => {
@@ -225,9 +295,23 @@ canvasElm.addEventListener("mouseup", (e) => {
 
 canvasElm.addEventListener("mousedown", (e) => {
   if (e.button != 0 || cooldown >= Date.now() - 400) {
-    return;
+    // prettier-ignore
+    if (pickingcolor == 1) {
+      try {
+        let boundingrect = canvasElm.getBoundingClientRect();
+        let x = Math.floor(e.clientX - boundingrect.left);
+        let y = Math.floor(e.clientY - boundingrect.top);
+        document.getElementById("color").value = canvas[Math.floor(x / PixelSize)][Math.floor(y / PixelSize)].color;
+        pickingcolor = 0;
+      } catch (_) {
+        document.getElementById("color").value = "";
+        pickingcolor = 0;
+      }
+      return;
+    } else {
+      return;
+    }
   }
-  cooldown = Date.now();
   let boundingrect = canvasElm.getBoundingClientRect();
   let x = Math.floor(e.clientX - boundingrect.left);
   let y = Math.floor(e.clientY - boundingrect.top);
@@ -235,16 +319,17 @@ canvasElm.addEventListener("mousedown", (e) => {
   // let color = Math.floor(Math.random() * 11);
   let color = document.getElementById("color").value;
 
-  singleCell(Math.floor(x / 20), Math.floor(y / 20), color);
+  singleCell(Math.floor(x / PixelSize), Math.floor(y / PixelSize), color);
 
   let senddata = {
-    x: Math.floor(x / 20),
-    y: Math.floor(y / 20),
+    x: Math.floor(x / PixelSize),
+    y: Math.floor(y / PixelSize),
     color: color,
   };
 
   console.log(senddata.x, senddata.y, senddata.color);
 
+  cooldown = Date.now();
   socket.emit("fill", senddata);
 });
 
@@ -258,7 +343,7 @@ canvasElm.addEventListener("contextmenu", (e) => {
 
   try {
     document.getElementById("selectedauthor").textContent = `Filled by ${
-      canvas[Math.floor(x / 20)][Math.floor(y / 20)].author
+      canvas[Math.floor(x / PixelSize)][Math.floor(y / PixelSize)].author
     }`;
   } catch (_) {
     document.getElementById("selectedauthor").textContent = `Filled by nobody`;
@@ -270,7 +355,12 @@ canvasElm.addEventListener("contextmenu", (e) => {
 
   // let color = canvas[Math.floor(x / 20)][Math.floor(y / 20)].color;
   ctx.strokeStyle = "#000000";
-  ctx.strokeRect(Math.floor(x / 20) * 20, Math.floor(y / 20) * 20, 20, 20);
+  ctx.strokeRect(
+    Math.floor(x / PixelSize) * PixelSize,
+    Math.floor(y / PixelSize) * PixelSize,
+    PixelSize,
+    PixelSize
+  );
 
   let authorstyle = document.getElementById("authordiv").style;
   authorstyle.position = "absolute";

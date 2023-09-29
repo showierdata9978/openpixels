@@ -81,3 +81,5 @@ Sends a chat message
 ### data
 
 `string`
+
+## There is a lot more that hasn't been added - working on it.

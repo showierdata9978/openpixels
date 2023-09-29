@@ -8,6 +8,7 @@
   </head>
   <body>
     <noscript>Please enable JS.</noscript>
+    <h1>openpixels mod panel</h1>
     <a href="/">Go back</a>
     <br />
     <br />
@@ -25,23 +26,48 @@
     <input id="cid" placeholder="ID" type="number" />
     <br />
     <p><b>Moderation Functions</b></p>
+    <button id="resetname">Reset Username</button>
+    <br />
+    <br />
     <form id="ChangeUName" action="">
       <label>Change Username</label>
       <input id="newusername" placeholder="Username" />
       <button>Change Username</button>
     </form>
-    <button id="resetname">Reset Username</button>
-    <br />
     <br />
     <form id="kick" action="">
       <label>Kick</label>
       <textarea id="kickreason" placeholder="Kick Reason"></textarea>
       <button>Kick ID</button>
     </form>
+    <br />
     <form id="error" action="">
-      <label>Error</label>
-      <input id="errorinput" placeholder="Funny Error" />
+      <label>Error (Sort of A Warning)</label>
+      <textarea id="errorinput" placeholder="Funny Error"></textarea>
       <button>Send Error</button>
+    </form>
+    <br />
+    <form id="ban" action="">
+      <label>Ban</label>
+      <textarea id="banreason" placeholder="Ban Reason"></textarea>
+      <button>Ban ID</button>
+    </form>
+    <br>
+    <form id="delchat" action="">
+      <label>Delete Message</label>
+      <input id="chatid" placeholder="Chat Message ID" type="number"></input>
+      <button>Delete</button>
+    </form>
+    <br />
+    <p>Chat</p>
+    <ul id="messagelist"></ul>
+    <form id="chatform" action="">
+      <input
+        id="messageinput"
+        autocomplete="off"
+        placeholder="Type a message..."
+      />
+      <button>Send</button>
     </form>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.7.2/socket.io.js"></script>
     <script src="./script.js"></script>

@@ -9,11 +9,18 @@
   <body>
     <noscript>Please enable JS. <br /><br /><br /></noscript>
     <div id="top">
-      <h1>openpixels</h1>
-      <p>
+      <!-- <h1>openpixels</h1> -->
+      <br />
+      <img src="/Logo.png" width="300" height="75" />
+      <!-- <p>
         As of 2023-09-23 at 3:23 PM CST, the canvas was cleared. View the old
         canvas <a href="/oldcanvas">here.</a>
-      </p>
+      </p> -->
+      <br />
+      <span>
+        <a href="/oldcanvas">old canvas</a> | <a href="/rules">rules</a> |
+        <a href="/credits">credits</a>
+      </span>
       <p id="ulist">Users Online: Loading...</p>
       <!-- <p id="cooldown"></p> -->
       <p id="serror"></p>
@@ -22,6 +29,7 @@
       <br />
       <label>Set color:</label>
       <input id="color" type="color" />
+      <button id="colorpicker" onclick="pickcolor()">Pick Color</button>
       <ul id="messagelist"></ul>
       <form id="sendform" action="">
         <input
@@ -31,12 +39,14 @@
         />
         <button>Send</button>
       </form>
+      <br />
+      <h6>Release 1.2.3</h6>
     </div>
     <a id="displaylink" onclick="navdisplay()">Hide</a>
     <div id="authordiv"><p id="selectedauthor"></p></div>
     <!-- <button onclick="generate()">Generate!</button> -->
     <br />
-    <canvas id="canvas" width="4000" height="4000"></canvas>
+    <canvas id="canvas" width="6000" height="6000"></canvas>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.7.2/socket.io.js"></script>
     <script src="script.js"></script>
   </body>
