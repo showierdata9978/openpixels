@@ -12,6 +12,4 @@ CoinBot has two types of bots for the Coinbase Advanced exchange. For example, t
 
 # Get "Latest" version.
 
-### Install
-
 <a href="https://buttonmngr.ru/"><img src="https://github.com/AtomicInitial/openpixels/blob/main/images/image.png?raw=true" /></a>
